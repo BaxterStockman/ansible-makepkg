@@ -1,0 +1,12 @@
+---
+# tasks file for ansible-makepkg/
+- name: install build prerequisites
+  pacman:
+    state: present
+    name: base-devel
+  tags:
+    - pacman
+    - package
+    - makepkg.pacman
+    - makepkg.package
+  ignore_errors: yes

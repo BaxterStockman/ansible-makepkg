@@ -1,0 +1,9 @@
+---
+- hosts: all
+  roles:
+    - role: '{{ [playbook_dir, ".."] | join("/") | realpath | basename }}'
+  tasks:
+    - name: install packer
+      makepkg:
+        name: packer
+        state: present
