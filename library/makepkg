@@ -91,8 +91,6 @@ import re
 import pwd
 import grp
 import shutil
-import urllib
-import urlparse
 
 PACMAN_PATH = "/usr/bin/pacman"
 MAKEPKG_PATH = "/usr/bin/makepkg"
@@ -179,7 +177,7 @@ def make_package(module, pkg, pkg_file_src):
         except Exception, err:
             module.fail_json(msg="failed to copy package %s to build directory %s: %s" % (pkg_file_src, build_dir, str(err)))
     else:
-        aur_req = urlparse.urlunsplit((AUR_SCHEME, AUR_NETLOC, "%s/%s" % (AUR_SNAPSHOT_PATH, pkg_file_basename), "", ""))
+        aur_req = urlunsplit((AUR_SCHEME, AUR_NETLOC, "%s/%s" % (AUR_SNAPSHOT_PATH, pkg_file_basename), "", ""))
         rsp, info = fetch_url(module, aur_req)
 
         if info['status'] != 200:
@@ -261,8 +259,8 @@ def install_package(module, pkg, pkg_file):
 
     if not pkg_file:
         # this is an aur pkg
-        rpc_params = urllib.urlencode({"type": "info", "arg": pkg})
-        rpc_req = urlparse.urlunsplit((AUR_SCHEME, AUR_NETLOC, AUR_RPC_PATH, rpc_params, ""))
+        rpc_params = urlencode({"type": "info", "arg": pkg})
+        rpc_req = urlunsplit((AUR_SCHEME, AUR_NETLOC, AUR_RPC_PATH, rpc_params, ""))
         rsp, info = fetch_url(module, rpc_req)
 
         # create a temporary file and copy content to do checksum-based replacement
@@ -361,6 +359,11 @@ def main():
         install_package(module, pkg, pkg_file)
     elif p['state'] == 'absent':
         remove_package(module, pkg)
+
+try:
+    from ansible.module_utils.six.moves.urllib.parse import urlencode, urlunsplit
+except ImportError:
+    from urllib import urlencode, urlunsplit
 
 # Used for downloading packages from the AUR
 from ansible.module_utils.urls import *
